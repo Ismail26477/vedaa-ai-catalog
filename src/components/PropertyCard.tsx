@@ -14,6 +14,13 @@ interface PropertyCardProps {
   index?: number
 }
 
+const getSafeImageUrl = (url?: string) => {
+  if (!url || url.startsWith("blob:") || url.includes("/src/assets/")) {
+    return "/placeholder.svg"
+  }
+  return url
+}
+
 const PropertyCard = memo(
   forwardRef<HTMLDivElement, PropertyCardProps>(({ property, onView, index = 0 }, ref) => {
     const { favorites, toggleFavorite } = useApp()
@@ -53,8 +60,11 @@ const PropertyCard = memo(
         {/* Image Section */}
         <div className="relative h-48 sm:h-56 overflow-hidden bg-secondary">
           <img
-            src={property.images[0] || "/placeholder.svg"}
+            src={getSafeImageUrl(property.images[0]) || "/placeholder.svg"}
             alt={property.title}
+            onError={(e) => {
+              ;(e.target as HTMLImageElement).src = "/placeholder.svg"
+            }}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
             loading="lazy"
           />
