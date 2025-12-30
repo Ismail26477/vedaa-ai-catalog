@@ -55,6 +55,13 @@ const amenityIcons: Record<string, React.ElementType> = {
   "Kids Play Area": Trees,
 }
 
+const getSafeImageUrl = (url?: string) => {
+  if (!url || url.startsWith("blob:") || url.includes("/src/assets/")) {
+    return "/placeholder.svg"
+  }
+  return url
+}
+
 export default function PropertyDetailModal({ property, isOpen, onClose, onBookVisit }: PropertyDetailModalProps) {
   const { favorites, toggleFavorite, addToRecentlyViewed } = useApp()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -160,8 +167,11 @@ export default function PropertyDetailModal({ property, isOpen, onClose, onBookV
                     initial={{ opacity: 0, scale: 1.05 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
-                    src={property.images[currentImageIndex]}
+                    src={getSafeImageUrl(property.images[currentImageIndex])}
                     alt={property.title}
+                    onError={(e) => {
+                      ;(e.target as HTMLImageElement).src = "/placeholder.svg"
+                    }}
                     className="w-full h-full object-cover"
                   />
 
